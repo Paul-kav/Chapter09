@@ -42,42 +42,67 @@ namespace WorkingWithStreams
         //Writing to xml streams
         static void WorkWithXml()
         {
-            //define a file to write to
-            string xmlFile = Combine(CurrentDirectory, "streams.xml");
+            FileStream? xmlFileStream = null;
+            XmlWriter? xml = null;
 
-            //create a file stream
-            FileStream xmlFileStream = File.Create(xmlFile);
+            try
+            {
+                //define a file to write to
+                string xmlFile = Combine(CurrentDirectory, "streams.xml");
 
-            //wrap the file stream in an XML writer helper
-            //and automatically indent nested elements
-            XmlWriter xml = XmlWriter.Create(xmlFileStream,
+                //create a file stream
+                //FileStream xmlFileStream = File.Create(xmlFile);
+                xmlFileStream = File.Create(xmlFile);
+
+                //wrap the file stream in an XML writer helper
+                //and automatically indent nested elements
+                //XmlWriter xml = XmlWriter.Create(xmlFileStream,
+                xml = XmlWriter.Create(xmlFileStream,
                 new XmlWriterSettings { Indent = true });
 
-            //write the Xml declaration
-            xml.WriteStartDocument();
+                //write the Xml declaration
+                xml.WriteStartDocument();
 
-            //write a root element
-            xml.WriteStartElement("callsigns");
+                //write a root element
+                xml.WriteStartElement("callsigns");
 
-            //enumerate the strings writing each one to the stream
-            foreach (string item in Viper.Callsigns)
-            {
-                xml.WriteElementString("callsign", item);
+                //enumerate the strings writing each one to the stream
+                foreach (string item in Viper.Callsigns)
+                {
+                    xml.WriteElementString("callsign", item);
+                }
+
+                //write the close root element
+                xml.WriteEndElement();
+
+                //close helper and stream
+                xml.Close();
+                xmlFileStream.Close();
+
+                //output all the contents of the file
+                WriteLine("{0} contains {1:NO} bytes.",
+                    arg0: xmlFile,
+                    arg1: new FileInfo(xmlFile).Length);
+                WriteLine(File.ReadAllText(xmlFile));
             }
-
-            //write the close root element
-            xml.WriteEndElement();
-
-            //close helper and stream
-            xml.Close();
-            xmlFileStream.Close();
-
-            //output all the contents of the file
-            WriteLine("{0} contains {1:NO} bytes.",
-                arg0: xmlFile,
-                arg1: new FileInfo(xmlFile).Length);
-            WriteLine(File.ReadAllText(xmlFile));
-
+            catch (Exception ex)
+            {
+                //if the path doesn't exist the exception will be caught
+                WriteLine($"{ex.GetType()} says {ex.Message}");
+            }
+            finally
+            {
+                if (xml != null)
+                {
+                    xml.Dispose();
+                    WriteLine("The XML writer's unmanaged resources have been disposed.");
+                    if (xmlFileStream != null)
+                    {
+                        xmlFileStream.Dispose();
+                        WriteLine("The file stream's unmanaged resources have been disposed.");
+                    }
+                }
+            }
         }
 
         static class Viper
