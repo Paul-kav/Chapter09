@@ -140,6 +140,14 @@ namespace WorkingWithFileSystems
             WriteLine($"Last accessed {info.LastAccessTime}");
             WriteLine($"Has readonly set to {info.IsReadOnly}");
 
+            //opening a file, read it and allowing other processes to read it too.
+            FileStream file = File.Open(pathToFile,
+                FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            //checking a file or directory's attributes
+            FileInfo info = new(backupFile);
+            WriteLine("Is the backup file compressed? {0}",
+                info.Attributes.HasFlag(FileAttributes.Compressed));
         }
 
 
