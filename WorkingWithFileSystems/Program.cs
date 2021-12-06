@@ -129,9 +129,16 @@ namespace WorkingWithFileSystems
             WriteLine($"File Name: {GetFileName(textFile)}");
             WriteLine("File Name without Extension: {0}",
                 GetFileNameWithoutExtension(textFile));
-            WriteLine($"File Extension: {GetExtension(textFile)}");
-            WriteLine($"Random File Name: {GetRandomFileName()}");
-            WriteLine($"Temporary File Name: {GetTempFileName()}");
+            WriteLine($"File Extension: {GetExtension(textFile)}"); 
+            WriteLine($"Random File Name: {GetRandomFileName()}"); //returns file name but doesn't create a file
+            WriteLine($"Temporary File Name: {GetTempFileName()}"); //creates a zero-byte file and returns it's name, ready for you to use
+
+            //getting file information
+            FileInfo info = new(backupFile);
+            WriteLine($"{backupFile}:");
+            WriteLine($"Contains {info.Length} bytes");
+            WriteLine($"Last accessed {info.LastAccessTime}");
+            WriteLine($"Has readonly set to {info.IsReadOnly}");
 
         }
 
