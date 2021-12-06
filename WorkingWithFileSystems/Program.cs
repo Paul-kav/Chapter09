@@ -124,7 +124,18 @@ namespace WorkingWithFileSystems
             WriteLine(textReader.ReadToEnd());
             textReader.Close();
 
+            //managing paths
+            WriteLine($"Folder Name: {GetDirectoryName(textFile)}");
+            WriteLine($"File Name: {GetFileName(textFile)}");
+            WriteLine("File Name without Extension: {0}",
+                GetFileNameWithoutExtension(textFile));
+            WriteLine($"File Extension: {GetExtension(textFile)}");
+            WriteLine($"Random File Name: {GetRandomFileName()}");
+            WriteLine($"Temporary File Name: {GetTempFileName()}");
+
         }
+
+
     }
 
 
