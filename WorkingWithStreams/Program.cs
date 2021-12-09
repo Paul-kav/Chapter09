@@ -4,6 +4,7 @@ using System.Xml;
 using static System.Console;
 using static System.Environment;
 using static System.IO.Path;
+using System.IO.Compression; //BrotliStream, GZipStream, CompressionMode
 
 namespace WorkingWithStreams
 {
@@ -13,6 +14,7 @@ namespace WorkingWithStreams
         {
             //WorkWithText();
             WorkWithXml();
+            WorkWithCompression();
         }
         //Writing to text streams
         static void WorkWithText()
@@ -113,6 +115,67 @@ namespace WorkingWithStreams
                 "Husker", "Starbuck", "Apollo", "Boomer",
                 "Bulldog", "Athena", "Helo", "Racetrack"
             };
+        }
+
+        static void WorkWithCompression()
+        {
+            string fileExt = "gzip";
+
+            //compress the XML output
+            string filePath = Combine(
+                CurrentDirectory, $"streams.{fileExt}");
+
+            FileStream file = File.Create(filePath);
+            Stream compressor = new GZipStream(file, CompressionMode.Compress);
+
+            using (compressor)
+            {
+                using (XmlWriter xml = XmlWriter.Create(compressor))
+                {
+                    xml.WriteStartDocument();
+                    xml.WriteStartElement("callsigns");
+
+                    foreach (string item in Viper.Callsigns)
+                    {
+                        xml.WriteElementString("callsign", item);
+                    }
+
+                    //the normal call to writeEndElement is not necessary
+                    //because when the xmlWriter disposes,it will
+                    //automatically end any elements of any depth
+                }
+            }//also closes the underlying stream
+
+            //output all the contents of the comprssed file
+            WriteLine("{0} contains {1:NO} bytes.",
+                filePath, new FileInfo(filePath).Length);
+
+            WriteLine($"The compressed contents:");
+            WriteLine(File.ReadAllText(filePath));
+
+            //read a compressed file
+            WriteLine("Reading the compressed XMLfile:");
+            file = File.Open(filePath, FileMode.Open);
+
+            Stream decompressor = new GZipStream(file, CompressionMode.Decompress);
+
+            using (decompressor)
+            {
+                using (XmlReader reader = XmlReader.Create(decompressor))
+                {
+                    while (reader.Read())//read the next xml node
+                    {
+                        //check if we are on an element node named callsign
+                        if ((reader.NodeType == XmlNodeType.Element)
+                            && (reader.Name == "callsign"))
+                        {
+                            reader.Read();//move to the text inside element
+                            WriteLine($"{reader.Value}"); //read it's value
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
