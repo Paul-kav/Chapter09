@@ -57,6 +57,23 @@ namespace WorkingWithSerialization
                 xs.Serialize(stream, people);
             }
 
+            //deserializing xml files
+            using (FileStream xmlLoad = File.Open(path, FileMode.Open))
+            {
+                //deserialize and cast the object graph into a list of person
+                List<Person>? loadedPeople =
+                    xs.Deserialize(xmlLoad) as List<Person>;
+
+                if (loadedPeople is not null)
+                {
+                    foreach (Person p in loadedPeople)
+                    {
+                        WriteLine("{0} has {1} children.",
+                            p.LastName, p.Children?.Count ?? 0);
+                    }
+                }
+            }
+
             WriteLine("Written {0:NO} bytes of XML to {1}",
                 arg0: new FileInfo(path).Length,
                 arg1: path);
