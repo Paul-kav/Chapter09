@@ -84,7 +84,24 @@ namespace WorkingWithSerialization
             //}
 
             //serializing with JSON
+            //create a file to write to
+            string jsonPath = Combine(CurrentDirectory, "people.json");
 
+            using (StreamWriter jsonStream = File.CreateText(jsonPath))
+            {
+                //create an object that will format as JSON
+                Newtonsoft.Json.JsonSerializer jss = new();
+
+                //serialize the object graph into a string
+                jss.Serialize(jsonStream, people);
+            }
+            WriteLine();
+            WriteLine("Written {0:NO} bytes of JSON to: {1}",
+                arg0: new FileInfo(jsonPath).Length,
+                arg1: jsonPath);
+
+            //display the serialized object graph
+            WriteLine(File.ReadAllText(jsonPath));
             
         }
     }
