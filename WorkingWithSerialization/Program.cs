@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml.Serialization;//XmlSerializer
 //using Packt.Shared; //person
 using static System.Console;
 using static System.Environment;
 using static System.IO.Path;
+using NewJson = System.Text.Json.JsonSerializer;
+
 
 
 namespace WorkingWithSerialization
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //create an object graph of person instances
             List<Person> people = new()
@@ -102,7 +105,24 @@ namespace WorkingWithSerialization
 
             //display the serialized object graph
             WriteLine(File.ReadAllText(jsonPath));
-            
+
+            //High Performance json processing
+            using FileStream jsonLoad = File.Open(jsonPath, FileMode.Open);//opening the Json file
+
+            //deserialize object graph into a List of person
+            List<Person>? loadedPeople =
+                await NewJson.DeserializeAsync(utf8Json: jsonLoad,
+                returnType: typeof(List<Person>)) as List<Person>;
+
+            if (loadedPeople is not null)
+            {
+                foreach (Person p in loadedPeople)
+                {
+                    WriteLine("{0} has {1} children.",
+                        p.LastName, p.Children?.Count ?? 0);
+                }
+            }
+
         }
     }
 
